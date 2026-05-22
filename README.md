@@ -130,43 +130,23 @@ claude  # Claude Code starten
 
 > Falls der Skill nicht erscheint, prüfe mit `ls ~/.claude/skills/security-review/SKILL.md` und `ls ~/.claude/skills/security-review/references/` ob Struktur stimmt.
 
-### 3. Cursor
+### 3. Cursor (ab Version 2.4, Januar 2026)
 
-Cursor verwendet kein Skill-Format, sondern **Rules** (`.cursor/rules/*.mdc`). Hierfür ist eine Adaptierung nötig: die SKILL.md wird in eine einzige `.mdc`-Datei mit YAML-Frontmatter konvertiert.
+Seit Cursor 2.4 sind **Agent Skills nativ unterstützt** — der gleiche SKILL.md-Standard wie bei Claude Code. Eine separate `.mdc`-Konvertierung ist nicht mehr nötig.
 
-**Variante A: Repo-lokal über `.cursor/rules/`**
-
+**Schritte:**
 ```bash
-mkdir -p .cursor/rules/
+mkdir -p .cursor/skills/
+cp -r /pfad/zu/security-review/ .cursor/skills/security-review/
 ```
 
-Lege folgende Datei an: `.cursor/rules/security-review.mdc`
+Dann in Cursor das Workspace neu laden: `Cmd/Ctrl+Shift+P → "Developer: Reload Window"`.
 
-```markdown
----
-description: Strukturierte, tiefgehende Schwachstellenanalyse nach OWASP Top 10, CWE Top 25, ASVS, MITRE ATT&CK. Aktiviere bei "Security Review", "Audit", "Schwachstellenanalyse", "Sicherheitsprüfung".
-globs:
-alwaysApply: false
----
+**Aktivierung:**
+- **Automatisch** via Agent-Discovery — Cursor liest die `description` aus der Frontmatter und triggert den Skill, wenn die User-Anfrage passt ("Security-Review", "Schwachstellenanalyse" etc.).
+- **Manuell** via Slash-Command-Menü: `/security-review` im Chat-Input.
 
-# Security Review
-
-[Vollständige SKILL.md hier einfügen — siehe security-review/SKILL.md]
-
-Die Referenzmodule (`references/*.md`) liegen im selben Ordner unter `.cursor/rules/security-review-refs/`. Lade sie nach Bedarf entsprechend Phase 1.5.
-```
-
-Dann die Referenzen mitkopieren:
-```bash
-mkdir -p .cursor/rules/security-review-refs/
-cp /pfad/zu/security-review/references/*.md .cursor/rules/security-review-refs/
-```
-
-**Aktivierungsmodus:** `alwaysApply: false` bedeutet "Agent Requested" — Cursor wählt den Skill nur, wenn die Beschreibung zur User-Anfrage passt. Das ist gewollt: der Skill soll nicht jede Konversation triggern, sondern nur Audit-Anfragen.
-
-**Variante B: User-global über `~/.cursor/rules/`** — analog, aber im Home-Verzeichnis. Wirkt für alle Cursor-Projekte.
-
-> Cursor liest `.cursor/rules/*.mdc` automatisch beim Start eines Workspaces. Reload via `Cmd+Shift+P → Reload Window` falls Änderung nicht sofort greift.
+**Hinweis zur Koexistenz mit Cursor Rules:** Cursor Rules (`.cursor/rules/*.mdc`) und Skills (`.cursor/skills/<name>/SKILL.md`) ergänzen sich. Rules eignen sich für *immer-aktive* Projekt-Konventionen (Coding-Style, Stack-Präferenzen). Skills eignen sich für *on-demand* Workflows wie diesen Security-Audit — der nicht jede Session triggern soll. Beide gleichzeitig zu nutzen ist explizit empfohlen.
 
 ### 4. Visual Studio Code (mit GitHub Copilot Chat oder Continue/Cline)
 
