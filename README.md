@@ -76,6 +76,16 @@ Auch ohne explizite Framework-Nennung — der Skill erkennt den Bedarf am Kontex
 
 Der Skill kann in vier verschiedenen Umgebungen verwendet werden. Die zugrundeliegenden Markdown-Dateien (SKILL.md + 38 references/) sind dieselben — nur Speicherort und Aktivierungsmechanismus unterscheiden sich.
 
+### 0. Komfortable Installation via npx skills
+
+Wenn im System bereits NodeJS installiert ist, kann der Skill mit einem Skillmanager installiert werden:
+
+```bash
+npx skill i milchundzucker/security-review-skill
+```
+
+Danach den gewünschten Agent starten. Der Skill sollte verfügbar sein. Es kann mit dem Prompt: `Welche Skills kennst du?` eine Liste der registrierten Skills vom ausgewaehlten Modell abgerufen werden.
+
 ### 1. Claude Desktop App / claude.ai
 
 Das Skill-Format ist nativ unterstützt seit der Skills-Einführung von Anthropic.
@@ -160,32 +170,16 @@ cp /pfad/zu/security-review/references/*.md .cursor/rules/security-review-refs/
 
 ### 4. Visual Studio Code (mit GitHub Copilot Chat oder Continue/Cline)
 
-VS Code selbst hat kein Skill-System, aber die gängigen AI-Coding-Extensions können Custom Instructions / System Prompts laden.
+In VS Code können Skills sowohl global (`~/.copilot/skills`) als auch projektbezogen (`.agents/skills`) installiert werden. In diesem Fall ergibt es Sinn, den Skill nur projektbezogen zu installieren um nicht versehentlich einen massiven Token-Verbrauch zu provozieren.
 
 **a) GitHub Copilot Chat — Custom Instructions:**
 
 ```bash
-mkdir -p .github/
+mkdir -p .agents/skills
+git clone git@github.com:milchundzucker/security-review-skill.git
 ```
 
-Erstelle `.github/copilot-instructions.md`:
-
-```markdown
-# Projekt-spezifische Instructions
-
-Bei Anfragen zu Security-Review, Audit, Schwachstellenanalyse oder Sicherheitsprüfung gelten die folgenden Regeln:
-
-[Inhalt von security-review/SKILL.md hier einfügen]
-
-Die Tiefenmodule liegen unter `.github/security-review-refs/` und können bei Bedarf gelesen werden.
-```
-
-```bash
-mkdir -p .github/security-review-refs/
-cp /pfad/zu/security-review/references/*.md .github/security-review-refs/
-```
-
-GitHub Copilot Chat liest `.github/copilot-instructions.md` automatisch ein.
+Danach VS Code am Besten (neu-)starten. Der Skill kann implizit aufgerufen werden (siehe weiter unten "Aufruf-Beispiele") als auch explizit über `/security-review-skill`.
 
 **b) Continue (continue.dev) — Custom Slash-Command:**
 
