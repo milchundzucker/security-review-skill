@@ -172,7 +172,9 @@ cp /pfad/zu/security-review/references/*.md .cursor/rules/security-review-refs/
 
 In VS Code können Skills sowohl global (`~/.copilot/skills`) als auch projektbezogen (`.agents/skills`) installiert werden. In diesem Fall ergibt es Sinn, den Skill nur projektbezogen zu installieren um nicht versehentlich einen massiven Token-Verbrauch zu provozieren.
 
-**a) GitHub Copilot Chat — Custom Instructions:**
+**a) GitHub Copilot Chat Extension:**
+
+Die [GitHub Copilot Chat Extension](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat) wird mit VS Code ausgeliefert und muss nicht gesondert installiert werden.
 
 ```bash
 mkdir -p .agents/skills
@@ -180,6 +182,8 @@ git clone git@github.com:milchundzucker/security-review-skill.git
 ```
 
 Danach VS Code am Besten (neu-)starten. Der Skill kann implizit aufgerufen werden (siehe weiter unten "Aufruf-Beispiele") als auch explizit über `/security-review-skill`.
+
+Referenz: [GitHub Docs: Adding agent skills for GitHub Copilot](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills)
 
 **b) Continue (continue.dev) — Custom Slash-Command:**
 
