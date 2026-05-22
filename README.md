@@ -218,50 +218,13 @@ cp -r /pfad/zu/security-review/references/ .roo/rules/
 
 [OpenCode](https://opencode.ai) ist ein Open-Source-Terminal-Agent (von SST), der mit jedem LLM-Provider arbeitet. Er unterstützt **AGENTS.md** sowie projekt-/user-globale Rules.
 
-**Variante A: Über `AGENTS.md` (empfohlen)**
+**Variante A: Über `.claude` (am einfachsten funktioniert dann auch für code claude)**
 
-OpenCode liest automatisch `AGENTS.md` im Projekt-Root. Hänge dort einen Verweis auf den Skill an:
-
+**User-global** (für alle Projekte des aktuellen Users):
 ```bash
-cat >> AGENTS.md << 'EOF'
-
-## Security-Review-Modus
-
-Bei User-Anfragen zu Security-Review, Audit, Schwachstellenanalyse, Sicherheitsprüfung
-oder "ist dieser Code sicher" lade die Anweisungen aus `.opencode/skills/security-review/SKILL.md`
-und folge dem 5-Phasen-Workflow. Tiefenmodule liegen in `.opencode/skills/security-review/references/`.
-
-Kernprinzipien: Evidenz vor Spekulation. Keine erfundenen Befunde. Read-only.
-EOF
-
-mkdir -p .opencode/skills/
-cp -r /pfad/zu/security-review/ .opencode/skills/security-review/
+mkdir -p ~/.claude/skills/
+cp -r /pfad/zu/security-review/ ~/.claude/skills/security-review/
 ```
-
-**Variante B: Über Custom Command**
-
-OpenCode unterstützt Custom Commands über `.opencode/commands/`. Lege an: `.opencode/commands/security-review.md`:
-
-```markdown
----
-description: Strukturierte Security-Review nach OWASP/CWE/ASVS/ATT&CK
----
-
-Du führst einen Security-Review durch. Lese und befolge `.opencode/skills/security-review/SKILL.md`.
-Beginne mit Phase 1 (Reconnaissance). Argument: $ARGUMENTS (Pfad oder Bereich, optional).
-```
-
-Aufruf im OpenCode-Chat: `/security-review src/auth.py`
-
-**Variante C: User-global**
-
-Wenn OpenCode systemweit den Skill nutzen soll:
-```bash
-mkdir -p ~/.config/opencode/skills/
-cp -r /pfad/zu/security-review/ ~/.config/opencode/skills/security-review/
-```
-Dann in `~/.config/opencode/AGENTS.md` einen entsprechenden Verweis ergänzen.
-
 ---
 
 ## Verifikation — funktioniert der Skill?
