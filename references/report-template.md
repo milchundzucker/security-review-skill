@@ -1,12 +1,13 @@
 # Bericht-Template
 
-Dieses Template definiert das Output-Format für den Security-Review-Bericht. Datei wird gespeichert als `SECURITY_REVIEW_YYYY-MM-DD.md` im Projekt-Root.
+Dieses Template definiert das Output-Format für den Security-Review-Bericht. Datei wird gespeichert als `SECURITY_REVIEW_HH:MM_YYYY-MM-DD.md` im Projekt-Root/doc.
 
 ---
 
 # Security Review Report — {Projektname}
 
 **Datum:** YYYY-MM-DD
+**Uhrzeit:** HH:MM
 **Auditor:** Claude Code (security-review skill)
 **Scope:** {z. B. "Volles Repo", "Diff PR #123", "src/api/* only"}
 **Frameworks:** OWASP Top 10 (2021/2025), CWE Top 25 (2024), {OWASP API Top 10}{, OWASP LLM Top 10}
