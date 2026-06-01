@@ -208,6 +208,7 @@ Bei unklarem Modus: einmal nachfragen, sonst Standard (Voll-Audit).
 - Bericht als Markdown: `SECURITY_REVIEW_<YYYY-MM-DD>.md` im Projekt-Root.
 - Bei >500 Zeilen: Befund-Details in `security-review/findings/` auslagern, Haupt-Bericht enthält nur Tabelle + Links.
 - Sprache: gleiche wie die Anfrage des Users. Technische Termini bleiben englisch.
+- Anonymisiere Secrets, Keys, Passwörter, Tokens, etc. 
 
 ---
 
