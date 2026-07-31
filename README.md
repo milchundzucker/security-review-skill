@@ -4,7 +4,7 @@ Skill für Anthropic Claude — strukturierte, tiefgehende Sicherheitsprüfung v
 
 ## Was der Skill liefert
 
-- **38 Tiefenmodule** mit Detection-Patterns (grep/rg), Unsafe-vs-Safe-Code-Beispielen, CWE-/OWASP-Mappings
+- **39 Tiefenmodule** mit Detection-Patterns (grep/rg), Unsafe-vs-Safe-Code-Beispielen, CWE-/OWASP-Mappings
 - **5-Phasen-Workflow**: Reconnaissance → Domain-Detection → Analyse → Evidenz → Klassifikation → Bericht
 - **Evidenzbasiert**: Jeder Befund mit konkreter Datei + Zeile + Code-Snippet. Keine erfundenen Findings.
 - **Zwei-Achsen-Klassifikation**: Schwere (Critical/High/Medium/Low/Info) × Ausnutzbarkeit (External-Unauth/Auth, Internal, Local, Supply-Chain)
@@ -22,7 +22,7 @@ Der Skill aktiviert sich u. a. bei:
 
 Auch ohne explizite Framework-Nennung — der Skill erkennt den Bedarf am Kontext.
 
-## Module (38)
+## Module (39)
 
 ### Immer geladen
 - `owasp-top10.md` — OWASP Top 10 (2021/2025)
@@ -71,10 +71,25 @@ Auch ohne explizite Framework-Nennung — der Skill erkennt den Bedarf am Kontex
 - `mitre-attack.md` — ATT&CK-Mapping für SOC
 - `threat-modeling.md` — STRIDE/DREAD/PASTA, DFD, Attack Trees
 - `privacy-compliance.md` — DSGVO, NIS2, PCI, HIPAA, BSI, ISO 27001
+- `bsi-grundschutz-plusplus.md` — BSI IT-Grundschutz++ (OSCAL/„Stand der Technik", NIS-2): CWE-/OWASP-→-Control-Mapping (KONF/DEV/BER/ARCH/DET/ASST/TEST/DLS)
+
+## Optionaler Richtlinien-Abgleich (MCP) — standardmäßig AUS
+
+Diese Version läuft **vollständig standalone** und benötigt keinen externen Dienst.
+Der Abgleich der Findings gegen eine interne Richtlinien-/ISMS-Quelle über einen
+MCP-Server ist ein **optionales, an- und ausschaltbares** Feature:
+
+- **`POLICY_MCP = off`** (Standard, Auslieferungszustand): Phase 2.7 wird übersprungen,
+  kein externer Aufruf. Genau so wird diese Repo-Variante ausgeliefert — **ohne MCP**.
+- **`POLICY_MCP = on`**: Aktiviert Phase 2.7. Setzt einen selbst betriebenen MCP-Server
+  mit dem Tool `map_finding_to_policy` voraus (bring-your-own; nicht Teil dieses Repos).
+  Ist der Schalter `on`, aber kein Server erreichbar, wird Phase 2.7 graceful übersprungen.
+
+Details siehe Abschnitt „Konfiguration" in `SKILL.md`.
 
 ## Installation
 
-Der Skill kann in vier verschiedenen Umgebungen verwendet werden. Die zugrundeliegenden Markdown-Dateien (SKILL.md + 38 references/) sind dieselben — nur Speicherort und Aktivierungsmechanismus unterscheiden sich.
+Der Skill kann in vier verschiedenen Umgebungen verwendet werden. Die zugrundeliegenden Markdown-Dateien (SKILL.md + 39 references/) sind dieselben — nur Speicherort und Aktivierungsmechanismus unterscheiden sich.
 
 ### 0. Komfortable Installation via npx skills
 
