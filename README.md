@@ -82,10 +82,16 @@ MCP-Server ist ein **optionales, an- und ausschaltbares** Feature:
 - **`POLICY_MCP = off`** (Standard, Auslieferungszustand): Phase 2.7 wird übersprungen,
   kein externer Aufruf. Genau so wird diese Repo-Variante ausgeliefert — **ohne MCP**.
 - **`POLICY_MCP = on`**: Aktiviert Phase 2.7. Setzt einen selbst betriebenen MCP-Server
-  mit dem Tool `map_finding_to_policy` voraus (bring-your-own; nicht Teil dieses Repos).
-  Ist der Schalter `on`, aber kein Server erreichbar, wird Phase 2.7 graceful übersprungen.
+  voraus (bring-your-own; nicht Teil dieses Repos). Ist der Schalter `on`, aber kein Server
+  erreichbar, wird Phase 2.7 graceful übersprungen.
+- **`POLICY_MCP_SERVER`** (Standard `policy-source-mcp`) und **`POLICY_MCP_TOOL`**
+  (Standard `map_finding_to_policy`): Server- und Tool-Name sind frei konfigurierbar — so
+  lässt sich jede eigene Richtlinien-Quelle anbinden.
 
-Details siehe Abschnitt „Konfiguration" in `SKILL.md`.
+**Die URL ist voll flexibel:** Sie steht *nicht* im Skill, sondern ausschließlich in der
+MCP-Client-Config (`.cursor/mcp.json`, Claude-Desktop-Config, `.vscode/mcp.json`) unter dem
+Namen aus `POLICY_MCP_SERVER` — lokal (stdio/Docker), `localhost`, VPN-intern oder öffentlich
+per `https://…`. Details siehe Abschnitt „Konfiguration" in `SKILL.md`.
 
 ## Installation
 

@@ -14,19 +14,37 @@ Der Skill verfügt über **39 Tiefenmodule** unter `references/`, die je nach er
 Der Skill läuft **standardmäßig vollständig standalone** — ohne externen Dienst, ohne Netz.
 
 Optional lässt sich ein Abgleich der Findings gegen eine **interne Richtlinien-/ISMS-Quelle**
-über einen MCP-Server (z. B. `policy-source-mcp`) zuschalten. Dieser Schalter ist **an- und
-ausschaltbar**:
+über einen MCP-Server zuschalten. Die Integration ist **an- und ausschaltbar** und über
+folgende Parameter **frei konfigurierbar** (Standardwerte in Fettdruck):
 
-| Schalter | Wert | Verhalten |
-|----------|------|-----------|
-| `POLICY_MCP` | **`off`** (Standard) | **Phase 2.7 wird übersprungen.** Kein externer Aufruf, kein interner Richtlinien-Abgleich im Bericht. Der Skill ist voll funktionsfähig. |
-| `POLICY_MCP` | `on` | Phase 2.7 aktiv. Setzt einen erreichbaren MCP-Server mit dem Tool `map_finding_to_policy` voraus (bring-your-own). |
+| Parameter | Wert | Bedeutung |
+|-----------|------|-----------|
+| `POLICY_MCP` | **`off`** (Standard) / `on` | Master-Schalter. Bei `off` wird **Phase 2.7 komplett übersprungen** — kein externer Aufruf, kein Richtlinien-Abgleich im Bericht. Der Skill ist voll funktionsfähig. Bei `on` läuft Phase 2.7. |
+| `POLICY_MCP_SERVER` | **`policy-source-mcp`** | Anzeigename der MCP-Server-Verbindung, wie er in der MCP-Client-Config eingetragen ist. Frei wählbar — beliebige eigene Quelle möglich (bring-your-own). |
+| `POLICY_MCP_TOOL` | **`map_finding_to_policy`** | Name des Tools, das pro Finding aufgerufen wird. Anpassen, falls der eigene Server das Mapping unter einem anderen Tool-Namen anbietet. |
+
+**Wo steht die URL/Adresse?** Weder URL noch Transport gehören in diesen Skill. Sie werden
+**ausschließlich in der MCP-Client-Konfiguration** (`.cursor/mcp.json`, Claude-Desktop-Config,
+`.vscode/mcp.json`) unter dem Namen aus `POLICY_MCP_SERVER` definiert — lokal (stdio/Docker),
+`localhost`, VPN-intern oder öffentlich per `https://…`. Der Skill spricht den Server nur über
+`POLICY_MCP_SERVER` + `POLICY_MCP_TOOL` an; die Adresse ist damit vollständig austauschbar.
+
+Beispiel-Client-Config (Name muss zu `POLICY_MCP_SERVER` passen):
+
+```json
+{
+  "mcpServers": {
+    "policy-source-mcp": { "url": "https://policy-mcp.intern.example.com/mcp" }
+  }
+}
+```
 
 **Diese Repo-Variante wird mit `POLICY_MCP = off` ausgeliefert (Version ohne MCP).**
-Zum Aktivieren: Wert auf `on` setzen (z. B. per Nutzer-Anweisung „mit Policy-MCP" bzw. in einer
-Team-Konfiguration) **und** einen passenden MCP-Server verbinden. Ist der Schalter `on`, aber
-kein MCP-Server erreichbar, wird Phase 2.7 mit einem Hinweis im Bericht **graceful übersprungen**
-— der übrige Review läuft unverändert.
+Zum Aktivieren: `POLICY_MCP` auf `on` setzen (z. B. per Nutzer-Anweisung „mit Policy-MCP" bzw.
+in einer Team-Konfiguration), ggf. `POLICY_MCP_SERVER`/`POLICY_MCP_TOOL` an die eigene Quelle
+anpassen **und** den Server in der Client-Config verbinden. Ist der Schalter `on`, aber kein
+passender MCP-Server erreichbar, wird Phase 2.7 mit einem Hinweis im Bericht **graceful
+übersprungen** — der übrige Review läuft unverändert.
 
 ## Kernprinzipien (nicht verhandelbar)
 
@@ -148,10 +166,11 @@ Arbeite die geladenen Referenzdateien systematisch ab. Jede enthält Detection-P
 Ist die Integration aktiv, wird jeder in Phase 2 bestätigte Befund zusätzlich gegen die
 interne Richtlinien-/ISMS-Quelle abgeglichen:
 
-1. Prüfen, ob ein MCP-Server mit dem Tool `map_finding_to_policy` erreichbar ist. Falls **nicht**
-   erreichbar → Phase 2.7 graceful überspringen, im Bericht als *„MCP nicht erreichbar — Abgleich
-   übersprungen"* vermerken, restlichen Review normal fortsetzen (kein Abbruch).
-2. Pro bestätigtem Finding `map_finding_to_policy` mit möglichst reichem Kontext aufrufen:
+1. Prüfen, ob die konfigurierte MCP-Verbindung (`POLICY_MCP_SERVER`, Standard `policy-source-mcp`)
+   mit dem konfigurierten Tool (`POLICY_MCP_TOOL`, Standard `map_finding_to_policy`) erreichbar ist.
+   Falls **nicht** erreichbar → Phase 2.7 graceful überspringen, im Bericht als *„MCP nicht erreichbar
+   — Abgleich übersprungen"* vermerken, restlichen Review normal fortsetzen (kein Abbruch).
+2. Pro bestätigtem Finding das Tool `POLICY_MCP_TOOL` mit möglichst reichem Kontext aufrufen:
    `cwe_id`, `owasp_id`, `title`, `description` und ein prägnantes `keyword`.
 3. Zurückgelieferte Richtlinien/Guides samt **Konfidenz-Score** aufnehmen; niedrige Konfidenz
    transparent kennzeichnen, nichts erfinden was der MCP nicht liefert.
