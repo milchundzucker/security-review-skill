@@ -1,13 +1,50 @@
 ---
 name: security-review
-description: Tiefgehende, strukturierte Schwachstellenanalyse von Quellcode nach OWASP Top 10 (2021/2025), OWASP API/LLM/Mobile Top 10, ASVS L1/L2/L3, CWE Top 25, OWASP CI/CD Top 10, MITRE ATT&CK und 25+ weiteren Tiefenmodulen (Krypto, OAuth/OIDC/SAML, Cloud, Container, Race-Conditions, DSGVO, Threat Modeling). Use this skill whenever the user asks for a security review, security audit, vulnerability scan, code security check, Schwachstellenanalyse, Sicherheitsprüfung, Sicherheitsaudit, Code-Audit, Pentest-Vorbereitung, threat model, ASVS-Verifikation, or asks "is this code secure". Also triggers on requests to find SQL injection, XSS, SSRF, IDOR, race conditions, auth/OAuth flaws, hardcoded secrets, prompt injection, insecure dependencies, container/K8s misconfigurations, or DSGVO/GDPR issues. Produces a deterministic, evidence-based report with severity, exploitability and a prioritized remediation TODO list — and refuses to invent findings not backed by concrete code evidence.
+description: Tiefgehende, strukturierte Schwachstellenanalyse von Quellcode nach OWASP Top 10 (2021/2025), OWASP API/LLM/Mobile Top 10, ASVS L1/L2/L3, CWE Top 25, OWASP CI/CD Top 10, MITRE ATT&CK, BSI IT-Grundschutz / Grundschutz++ / NIS-2 „Stand der Technik" und 25+ weiteren Tiefenmodulen (Krypto, OAuth/OIDC/SAML, Cloud, Container, Race-Conditions, DSGVO, Threat Modeling). Use this skill whenever the user asks for a security review, security audit, vulnerability scan, code security check, Schwachstellenanalyse, Sicherheitsprüfung, Sicherheitsaudit, Code-Audit, Pentest-Vorbereitung, threat model, ASVS-Verifikation, BSI-Grundschutz-/Grundschutz++-/NIS-2-Nachweis, or asks "is this code secure". Also triggers on requests to find SQL injection, XSS, SSRF, IDOR, race conditions, auth/OAuth flaws, hardcoded secrets, prompt injection, insecure dependencies, container/K8s misconfigurations, or DSGVO/GDPR issues. Produces a deterministic, evidence-based report with severity, exploitability and a prioritized remediation TODO list — and refuses to invent findings not backed by concrete code evidence.
 ---
 
 # Security Review — Strukturierte Schwachstellenanalyse
 
 Dieser Skill führt eine systematische, evidenzbasierte Sicherheitsprüfung von Quellcode durch und liefert einen Befundbericht mit klassifizierter Schwere, externer Ausnutzbarkeit und konkreten Behebungsschritten.
 
-Der Skill verfügt über **38 Tiefenmodule** unter `references/`, die je nach erkannter Technologie automatisch geladen werden — von OWASP Top 10 / ASVS über Cloud/Container/CI-CD/Crypto bis hin zu GraphQL, WebSockets, AI/ML-Pipelines, IoT-Firmware, Electron-Desktop, Webhooks, E-Mail/DNS, datenbankspezifischer Tiefenanalyse, Smart Contracts, Mobile, Threat Modeling, Authorization-Modellen und DSGVO-Mapping.
+Der Skill verfügt über **39 Tiefenmodule** unter `references/`, die je nach erkannter Technologie automatisch geladen werden — von OWASP Top 10 / ASVS über Cloud/Container/CI-CD/Crypto bis hin zu GraphQL, WebSockets, AI/ML-Pipelines, IoT-Firmware, Electron-Desktop, Webhooks, E-Mail/DNS, datenbankspezifischer Tiefenanalyse, Smart Contracts, Mobile, Threat Modeling, Authorization-Modellen, DSGVO- und BSI-IT-Grundschutz-++-Mapping.
+
+## Konfiguration — optionaler Richtlinien-Abgleich (MCP)
+
+Der Skill läuft **standardmäßig vollständig standalone** — ohne externen Dienst, ohne Netz.
+
+Optional lässt sich ein Abgleich der Findings gegen eine **interne Richtlinien-/ISMS-Quelle**
+über einen MCP-Server zuschalten. Die Integration ist **an- und ausschaltbar** und über
+folgende Parameter **frei konfigurierbar** (Standardwerte in Fettdruck):
+
+| Parameter | Wert | Bedeutung |
+|-----------|------|-----------|
+| `POLICY_MCP` | **`off`** (Standard) / `on` | Master-Schalter. Bei `off` wird **Phase 2.7 komplett übersprungen** — kein externer Aufruf, kein Richtlinien-Abgleich im Bericht. Der Skill ist voll funktionsfähig. Bei `on` läuft Phase 2.7. |
+| `POLICY_MCP_SERVER` | **`policy-source-mcp`** | Anzeigename der MCP-Server-Verbindung, wie er in der MCP-Client-Config eingetragen ist. Frei wählbar — beliebige eigene Quelle möglich (bring-your-own). |
+| `POLICY_MCP_TOOL` | **`map_finding_to_policy`** | Name des Tools, das pro Finding aufgerufen wird. Anpassen, falls der eigene Server das Mapping unter einem anderen Tool-Namen anbietet. |
+
+**Wo steht die URL/Adresse?** Weder URL noch Transport gehören in diesen Skill. Sie werden
+**ausschließlich in der MCP-Client-Konfiguration** (`.cursor/mcp.json`, Claude-Desktop-Config,
+`.vscode/mcp.json`) unter dem Namen aus `POLICY_MCP_SERVER` definiert — lokal (stdio/Docker),
+`localhost`, VPN-intern oder öffentlich per `https://…`. Der Skill spricht den Server nur über
+`POLICY_MCP_SERVER` + `POLICY_MCP_TOOL` an; die Adresse ist damit vollständig austauschbar.
+
+Beispiel-Client-Config (Name muss zu `POLICY_MCP_SERVER` passen):
+
+```json
+{
+  "mcpServers": {
+    "policy-source-mcp": { "url": "https://policy-mcp.intern.example.com/mcp" }
+  }
+}
+```
+
+**Diese Repo-Variante wird mit `POLICY_MCP = off` ausgeliefert (Version ohne MCP).**
+Zum Aktivieren: `POLICY_MCP` auf `on` setzen (z. B. per Nutzer-Anweisung „mit Policy-MCP" bzw.
+in einer Team-Konfiguration), ggf. `POLICY_MCP_SERVER`/`POLICY_MCP_TOOL` an die eigene Quelle
+anpassen **und** den Server in der Client-Config verbinden. Ist der Schalter `on`, aber kein
+passender MCP-Server erreichbar, wird Phase 2.7 mit einem Hinweis im Bericht **graceful
+übersprungen** — der übrige Review läuft unverändert.
 
 ## Kernprinzipien (nicht verhandelbar)
 
@@ -119,6 +156,30 @@ Arbeite die geladenen Referenzdateien systematisch ab. Jede enthält Detection-P
 - Bei Container: Root-User, privileged, unscoped Volume Mounts
 - Bei CI/CD: pull_request_target, Action-Pinning, Secrets in Logs
 
+### Phase 2.7 — Interner Richtlinien-Abgleich (OPTIONAL, nur bei `POLICY_MCP = on`)
+
+> **Standardmäßig übersprungen.** Diese Phase läuft **nur**, wenn der Schalter `POLICY_MCP`
+> (siehe Abschnitt „Konfiguration") auf `on` steht **und** ein MCP-Server verbunden ist.
+> Bei `off` — dem Auslieferungszustand dieser Version — diese Phase komplett überspringen und
+> in Bericht-Sektion 8 vermerken: *„Interner Richtlinien-Abgleich (MCP) deaktiviert."*
+
+Ist die Integration aktiv, wird jeder in Phase 2 bestätigte Befund zusätzlich gegen die
+interne Richtlinien-/ISMS-Quelle abgeglichen:
+
+1. Prüfen, ob die konfigurierte MCP-Verbindung (`POLICY_MCP_SERVER`, Standard `policy-source-mcp`)
+   mit dem konfigurierten Tool (`POLICY_MCP_TOOL`, Standard `map_finding_to_policy`) erreichbar ist.
+   Falls **nicht** erreichbar → Phase 2.7 graceful überspringen, im Bericht als *„MCP nicht erreichbar
+   — Abgleich übersprungen"* vermerken, restlichen Review normal fortsetzen (kein Abbruch).
+2. Pro bestätigtem Finding das Tool `POLICY_MCP_TOOL` mit möglichst reichem Kontext aufrufen:
+   `cwe_id`, `owasp_id`, `title`, `description` und ein prägnantes `keyword`.
+3. Zurückgelieferte Richtlinien/Guides samt **Konfidenz-Score** aufnehmen; niedrige Konfidenz
+   transparent kennzeichnen, nichts erfinden was der MCP nicht liefert.
+4. Ergebnis in Bericht-Sektion 8 als eigene Untertabelle „Interner Richtlinien-Abgleich" ausgeben
+   (Finding · Richtlinie/Guide · Konfidenz).
+
+Diese Phase ändert **nie** die Befundliste selbst — sie reichert bestätigte Findings nur um
+Richtlinien-Bezug an. Der MCP-Server ist **nicht** Bestandteil dieses Repos.
+
 ### Phase 3 — Evidenz sammeln
 
 Für jeden Verdachtsfall aus Phase 2:
@@ -164,6 +225,7 @@ Für sicherheitskritische Befunde zusätzlich die MITRE-ATT&CK-Technique-ID ange
 #### 4d. Optional: Compliance-Mapping
 
 Wenn relevant: Bezug zu DSGVO/PCI/HIPAA/NIS2/ISO27001 angeben (siehe `references/privacy-compliance.md`).
+Bei BSI-/Grundschutz++-/NIS-2-Kontext (deutsche Behörde/KRITIS, „Stand der Technik"-Nachweis) zusätzlich die bestätigten Findings auf Grundschutz++-Controls mappen (siehe `references/bsi-grundschutz-plusplus.md`).
 
 ### Phase 5 — Bericht generieren
 
@@ -211,7 +273,7 @@ Bei unklarem Modus: einmal nachfragen, sonst Standard (Voll-Audit).
 
 ---
 
-## Modul-Übersicht (38 Referenzen)
+## Modul-Übersicht (39 Referenzen)
 
 ### Immer geladen (Phase 1.5)
 
@@ -275,6 +337,7 @@ Bei unklarem Modus: einmal nachfragen, sonst Standard (Voll-Audit).
 | `mitre-attack.md` | SOC-Bericht angefragt oder sicherheitskritische Domain |
 | `threat-modeling.md` | Threat-Model-Modus oder Architektur-Review |
 | `privacy-compliance.md` | Compliance-Modus oder PII/PHI im Code erkannt |
+| `bsi-grundschutz-plusplus.md` | BSI IT-Grundschutz / Grundschutz++ / SdT-Bibliothek genannt, NIS-2-Kontext, deutsche Behörde/KRITIS oder „Stand der Technik"-Nachweis |
 
 ---
 
